@@ -328,9 +328,7 @@ if __name__ == "__main__":
             choice = input("\nEnter action: ").lower().strip()
         print("=====================")
         print("You decided to:", choice)
-        # Generate new event (record current location)
-        event = Event(curr_location.id_num, curr_location.brief_description)
-        game_log.add_event(event, choice)
+
         if choice not in curr_location.available_commands:
             # Choices don't change location
             if choice == "log":
@@ -369,6 +367,12 @@ if __name__ == "__main__":
             result = curr_location.available_commands[choice]
             game.current_location_id = result
             game.score += 5
+
+            # Generate new event (record current location)
+            curr_location = game.get_current_location()
+            event_desc = f"LOCATION: {curr_location.id_num}\nCommand {choice}"
+            event = Event(curr_location.id_num, event_desc)
+            game_log.add_event(event, choice)
 
         # Win condition
         if not game.targets:

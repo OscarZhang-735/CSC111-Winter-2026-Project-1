@@ -74,7 +74,7 @@ class EventList:
         curr = self.first
         move = 1
         while curr:
-            print(f"{move}-Location: {curr.id_num}, Command: {curr.next_command}")
+            print(f"Event {move}: Location: {curr.id_num}, Command: {curr.next_command}")
             curr = curr.next
             move += 1
 

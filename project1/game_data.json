@@ -40,7 +40,7 @@
       "id": 4,
       "name": "Robarts Research Library",
       "brief_description": "Robarts Library\nExits: East -> Study Lounge, South -> Coffee Shop",
-      "long_description": "You step into Robarts Research Library. The second floor corner desks are quiet and dimly lit—exactly where you studied last night.\n\nExits:\n- East -> Study Lounge\n- South -> Coffee Shop",
+      "long_description": "You step into Robarts Research Library. The second floor corner desks are quiet and dimly lit-exactly where you studied last night.\n\nExits:\n- East -> Study Lounge\n- South -> Coffee Shop",
       "available_commands": {
         "go east": 2,
         "go south": 5

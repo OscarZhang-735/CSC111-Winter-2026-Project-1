@@ -187,7 +187,7 @@ class AdventureGame:
             if item.name == "locker":
                 if "locker_opened" in self.flags:
                     print("The locker has already been opened.")
-                elif "knows_password" not in self.flags:
+                elif "forgot_password" not in self.flags:
                     print("You try to remember the password... but your mind goes blank.")
                     print("You realize you must have written it down somewhere....Under the friend's carpet?")
                     self.flags.add("forgot_password")
@@ -206,7 +206,7 @@ class AdventureGame:
                     print("Something clicks. This must be the password hint.")
 
             elif item.name == "photo album":
-                if "saw_password_hint" in self.flags and "knows_password" not in self.flags:
+                if "saw_password_hint" in self.flags and "forgot_password" in self.flags and "knows_password" not in self.flags:
                     self.score += 10
                     self.flags.add("knows_password")
                     print("You flip through the album carefully.")
@@ -253,26 +253,56 @@ class AdventureGame:
                 self.targets.remove(item_name)
                 self.get_item_by_name(item_name).fixed = True
 
+    def save_game(self) -> None:
+        """Save the current game state to a file. Log will not be saved."""
+        with open("save.json", "w") as f:
+            data = {
+                "current_location_id": self.current_location_id,
+                "inventory": [item.name for item in self.inventory],
+                "score": self.score,
+                "flags": list(self.flags)
+            }
+            json.dump(data, f)
+
+    def read_game(self) -> None:
+        """Read saved game state from a file."""
+        with open("save.json", 'r') as f:
+            data = json.load(f)
+
+        self.current_location_id = int(data["current_location_id"])
+        self.score = int(data["score"])
+        self.flags = set(data["flags"])
+
+        self.inventory = []
+        for name in data["inventory"]:
+            item = self.get_item_by_name(name)
+            if item is not None:
+                self.inventory.append(item)
+
 
 if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
-    import python_ta
-
-    python_ta.check_all(config={
-        'max-line-length': 120,
-        'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
-    })
+    # import python_ta
+    #
+    # python_ta.check_all(config={
+    #     'max-line-length': 120,
+    #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
+    # })
     game_log = EventList()  # This is REQUIRED as one of the baseline requirements
     game = AdventureGame('game_data.json', 1)  # load data, setting initial location ID to 1
+    try:
+        game.read_game()
+    except FileNotFoundError:
+        pass
     menu = ["look", "inventory", "score", "log", "quit"]  # Regular menu options available at each location
     choice = None
     print("""
     Welcome to the Text Adventure Game!
 
     Your goal is to find the missing items and return them to your dorm room
-    before you run out of moves.
+    before you run out of 20 moves.
 
     How to play:
     - Move between locations using commands like:
@@ -343,7 +373,8 @@ if __name__ == "__main__":
                 curr_location.visited = True
 
             elif choice == "quit":
-                print("You quit the game.")
+                game.save_game()
+                print("You save and quit the game.")
                 game.ongoing = False
 
             elif choice.startswith("take "):

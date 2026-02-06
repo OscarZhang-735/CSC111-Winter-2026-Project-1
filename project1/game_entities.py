@@ -89,12 +89,7 @@ class Item:
 
     name: str
     description: str
-    start_position: int
-    target_position: int
-    target_points: int
     fixed: bool
-    locked: bool
-    messages: str
     reveals_flag: str
 
 

@@ -72,9 +72,11 @@ class EventList:
     def display_events(self) -> None:
         """Display all events in chronological order."""
         curr = self.first
+        move = 1
         while curr:
-            print(f"Location: {curr.id_num}, Command: {curr.next_command}")
+            print(f"{move}-Location: {curr.id_num}, Command: {curr.next_command}")
             curr = curr.next
+            move += 1
 
     #  That is, the function headers (parameters, return type, etc.) must NOT be changed.
     def is_empty(self) -> bool:

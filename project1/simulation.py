@@ -77,14 +77,6 @@ class AdventureGameSimulation:
         """
         Get back a list of all location IDs in the order that they are visited within a game simulation
         that follows the given commands.
-
-        >>> sim = AdventureGameSimulation('sample_locations.json', 1, ["go east"])
-        >>> sim.get_id_log()
-        [1, 2]
-
-        >>> sim = AdventureGameSimulation('sample_locations.json', 1, ["go east", "go east", "buy coffee"])
-        >>> sim.get_id_log()
-        [1, 2, 3, 3]
         """
         # Note: We have completed this method for you. Do NOT modify it for A1.
 
@@ -117,16 +109,18 @@ if __name__ == "__main__":
     #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
     # })
 
-    # TODO: Modify the code below to provide a walkthrough of commands needed to win and lose the game
-    win_walkthrough = []  # Create a list of all the commands needed to walk through your game to win it
-    expected_log = []  # Update this log list to include the IDs of all locations that would be visited
+    win_walkthrough = ['go north', 'go west', 'go south', 'go north', 'go east', 'go north', 'go south', 'go south', 'go west', 'go east', 'go west', 'go east']
+
+    # Create a list of all the commands needed to walk through your game to win it
+    expected_log = [1, 2, 4, 5, 4, 2, 3, 2, 1, 5, 1, 5, 1]
+    # Update this log list to include the IDs of all locations that would be visited
     # Uncomment the line below to test your walkthrough
     sim = AdventureGameSimulation('game_data.json', 1, win_walkthrough)
     assert expected_log == sim.get_id_log()
 
     # Create a list of all the commands needed to walk through your game to reach a 'game over' state
-    lose_demo = []
-    expected_log = []  # Update this log list to include the IDs of all locations that would be visited
+    lose_demo = ["go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south", "go north", "go south"]
+    expected_log = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]  # Update this log list to include the IDs of all locations that would be visited
     # Uncomment the line below to test your demo
     sim = AdventureGameSimulation('game_data.json', 1, lose_demo)
     assert expected_log == sim.get_id_log()

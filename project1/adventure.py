@@ -83,6 +83,7 @@ class AdventureGame:
 
         self.inventory = []
         self.flags = set()
+        self.flags.add("none")
         self.score = 0
 
     @staticmethod
@@ -105,13 +106,8 @@ class AdventureGame:
             item_obj = Item(
                 item_data['name'],
                 item_data['description'],
-                item_data['start_position'],
-                item_data['target_position'],
-                item_data['target_points'],
-                item_data.get('fixed', False),
-                item_data.get('locked', False),
-                item_data.get('messages', None),
-                item_data.get('reveals_flag', None)
+                item_data['fixed'],
+                item_data['reveals_flag']
             )
             items.append(item_obj)
 
@@ -123,7 +119,7 @@ class AdventureGame:
         """
 
         if loc_id is None:
-            return self._locations[self.current_location_id]
+            return self.get_current_location()
         else:
             return self._locations[loc_id]
 
@@ -152,12 +148,16 @@ if __name__ == "__main__":
     #     'max-line-length': 120,
     #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
     # })
-
+    temp_cmd = []
+    temp_location_id = []
     game_log = EventList()  # This is REQUIRED as one of the baseline requirements
     game = AdventureGame('game_data.json', 1)  # load data, setting initial location ID to 1
     menu = ["look", "inventory", "score", "log", "quit"]  # Regular menu options available at each location
+    targets = ["lucky mug", "usb drive", "laptop charger"]
     choice = None
-
+    move = 0
+    # TODO: instruction
+    print("")
     # Note: You may modify the code below as needed; the following starter code is just a suggestion
     while game.ongoing:
         # Note: If the loop body is getting too long, you should split the body up into helper functions
@@ -170,45 +170,41 @@ if __name__ == "__main__":
         game_log.add_event(event, choice)
 
         if not location.visited:
-            print(location.long_description)
+            print(f"LOCATION-{location.id_num}: {location.long_description}")
             location.visited = True
         else:
-            print(location.brief_description)
-
+            print(f"LOCATION-{location.id_num}: {location.brief_description}")
 
         # 显示可拿取/查看物品
         pickup_items = []
+        print("You see the following items:")
         for item_name in location.items:
             item = game.get_item_by_name(item_name)
-            if item is not None and not item.fixed:
+            if item is not None and item.reveals_flag in game.flags:
                 pickup_items.append(item_name)
+                print("-", item_name)
+        if not pickup_items:
+            print("You can't find any item here.")
 
-        if pickup_items:
-            print("You see the following items:")
-            for name in pickup_items:
-                print("-", name)
-
-        # Display possible actions at this location
-        print("What to do? Choose from: look, inventory, take <item>, check<item>, score, log, quit")
-
+        print("What to do? Choose from: look, inventory, take <item>, check <item>, drop, score, log, quit")
         print("At this location, you can also:")
         for action in location.available_commands:
             print("-", action)
 
         # Validate choice
         choice = input("\nEnter action: ").lower().strip()
-        while choice not in location.available_commands and choice not in menu and not choice.startswith("take ") and not choice.startswith("check ") and not choice.startswith("drop "):   #这里我最后加了检查take check drop 不知道可不可以  原版是 while choice not in location.available_commands and choice not in menu:
-
+        while choice not in location.available_commands and choice not in menu and not choice.startswith(
+                "take ") and not choice.startswith("check ") and not choice.startswith("drop "):
             print("That was an invalid option; try again.")
             choice = input("\nEnter action: ").lower().strip()
-
-        print("========")
+        print("=====================")
         print("You decided to:", choice)
 
-        if choice in menu:
+        if choice not in location.available_commands:
+            # Choices don't change location
             if choice == "log":
                 game_log.display_events()
-            # ENTER YOUR CODE BELOW to handle other menu commands (remember to use helper functions as appropriate)
+
             elif choice == "inventory":
                 if not game.inventory:
                     print("Your inventory is empty.")
@@ -216,9 +212,6 @@ if __name__ == "__main__":
                     print("You are carrying:")
                     for it in game.inventory:
                         print("-", it.name)
-                    print("! You can:")
-                    print("- check <item>")
-                    print("- drop <item>")
 
             elif choice == "score":
                 print("Current score:", game.score)
@@ -231,110 +224,120 @@ if __name__ == "__main__":
                 print("You quit the game.")
                 game.ongoing = False
 
-        elif choice.startswith("take "):
-            item_name = choice[5:]
-            if item_name in location.items:
-                item = game.get_item_by_name(item_name)
-                if item is None:
-                    print("That item does not exist.")
-                elif item.fixed:
-                    print("You can't take that.")
-                elif item.locked:
-                    print("It's locked.")
-                else:
-                    location.items.remove(item_name)
-                    game.inventory.append(item)
-                    print(f"You picked up the {item_name}.")
-            else:
-                print("That item is not here.")
-
-        elif choice.startswith("check "):  # 查看物品
-            item_name = choice[6:].strip()
-            # 背包
-            item = None
-            for it in game.inventory:
-                if it.name == item_name:
-                    item = it
-                    break
-            # 2) 背包里没有 检查当前地点是否有
-            if item is None:
+            elif choice.startswith("take "):
+                item_name = choice[5:]
                 if item_name in location.items:
                     item = game.get_item_by_name(item_name)
+                    if item is None:
+                        print("That item does not exist.")
+                    elif item.fixed:
+                        print("You can't take that.")
+                    else:
+                        location.items.remove(item_name)
+                        game.inventory.append(item)
+                        print(f"You picked up the {item_name}.")
                 else:
-                    print("You don't see that here.")
-                    item = None
-            if item is None:
-                pass
-            elif item.name == "locker":
-                print(item.description)
-                print("You try to remember the password... but your mind goes blank.")
+                    print("That item is not here.")
 
-                if "forgot_password" not in game.flags:
-                    game.flags.add("forgot_password")
-                    print("You realize you must have written it down somewhere....Under the friend's carpet?")
+            elif choice.startswith("check "):
+                item_name = choice[6:].strip()
+                item = None
+                for it in game.inventory:
+                    if it.name == item_name:
+                        item = it
+                        break
+                if item is None:
+                    print("It's not in your inventory.")
+                    if item_name in location.items:
+                        item = game.get_item_by_name(item_name)
+                    else:
+                        print("You don't see the item here.")
 
-                    note = game.get_item_by_name("password note")
-                    if note is not None:
-                        note.fixed = False
+                if item is not None:
+                    print(item.description)
+                    # Special items
+                    if item.name == "locker":
+                        if "locker_opened" in game.flags:
+                            print("The locker has already been opened.")
+                        if "knows_password" not in game.flags:
+                            print("You try to remember the password... but your mind goes blank.")
+                            print("You realize you must have written it down somewhere....Under the friend's carpet?")
+                            game.flags.add("forgot_password")
+                            game.score += 10
+                        else:
+                            print("The locker is opened and the lucky mug has been ADDED to your inventory.")
+                            game.inventory.append(game.get_item_by_name("lucky mug"))
+                            game.flags.add("locker_opened")
+                            game.score += 10
 
-            elif item.name == "password note":
-                print(item.description)
-
-                if "forgot_password" in game.flags:
-                    if "saw_password_hint" not in game.flags:
+                    elif item.name == "password note":
                         game.flags.add("saw_password_hint")
                         print("Something clicks. This must be the password hint.")
+                        game.score += 10
 
-            elif item.name == "photo album":   # 是否找到密码
-                if "saw_password_hint" not in game.flags:
-                    # 没看过纸条：显示普通描述
-                    print(item.description)
+                    elif item.name == "photo album":
+                        if "saw_password_hint" in game.flags:
+                            print("You flip through the album carefully.")
+                            print(
+                                "You find a photo of you with your mom and dad in front of the University of Toronto gate.")
+                            print("It was your first time here. Little you made a wish to study here one day.")
+                            # TODO: MAKE PUZZLE HERE
+                            print("You gently take the photo out. On the back, it says a 2009-08-20")
+                            game.flags.add("knows_password")
+                            game.score += 10
+
+                    elif item.name == "phone":
+                        game.flags.add("read_phone")
+                        game.score += 10
+
+            elif choice.startswith("drop "):
+                item_name = choice[5:].strip()
+
+                drop_item = None
+                for it in game.inventory:
+                    if it.name == item_name:
+                        drop_item = it
+                        break
+
+                if drop_item is None:
+                    print("You are not carrying that.")
                 else:
-                    # 看过纸条
-                    print("You flip through the album carefully.")
-                    print("You find a photo of you with your mom and dad in front of the University of Toronto gate.")
-                    print("It was your first time here. Little you made a wish to study here one day.")
-                    print("You gently take the photo out. On the back, it says: 2009-08-20.")
-                    if "knows_password" not in game.flags:
-                        game.flags.add("knows_password")
-                        print("\nYou suddenly remember the locker password.")
-            else:
-                # 描述
-                print(item.description)
-                # 显示手机信息
-                if hasattr(item, "messages") and item.messages:
-                    print("\nYou see the following:")
-                    for msg in item.messages:
-                        print("-", msg)
-                # 解锁 flag
-                if hasattr(item, "reveals_flag") and item.reveals_flag:
-                    if item.reveals_flag not in game.flags:
-                        game.flags.add(item.reveals_flag)
-                        print("You feel like you learned something important.")
-
-        elif choice.startswith("drop "):
-            item_name = choice[5:].strip()
-
-            drop_item = None
-            for it in game.inventory:
-                if it.name == item_name:
-                    drop_item = it
-                    break
-
-            if drop_item is None:
-                print("You are not carrying that.")
-            else:
-                game.inventory.remove(drop_item)
-                location.items.append(drop_item.name)
-                print(f"You dropped the {item_name} here.")
+                    game.inventory.remove(drop_item)
+                    location.items.append(drop_item.name)
+                    print(f"You dropped the {item_name} here.")
+                    if item_name in targets and game.current_location_id == 1:
+                        print(f"You successfully dropped an target item here.")
+                        game.score += 30  # 20 pts for dropping target items
+                        targets.remove(item_name)
+                        game.get_item_by_name(item_name).fixed = True
 
         else:
-            # Handle non-menu actions
+            # Choices change location
+            move += 1
             result = location.available_commands[choice]
             game.current_location_id = result
+            game.score += 5
 
-            # TODO: Add in code to deal with actions which do not change the location (e.g. taking or using an item)
-            # TODO: Add in code to deal with special locations (e.g. puzzles) as needed for your game
+        # Win condition
+        if not targets:
+            print("You win.")
+            print("Score:", game.score)
+            print("Choices made:")
+            game_log.display_events()
+            game.ongoing = False
+            print(temp_cmd)
+            print(temp_location_id)
 
+        # Check max move
+        if move >= 20:
+            print("You lost.")
+            print("Score:", game.score)
+            print("Choices made:")
+            game_log.display_events()
+            game.ongoing = False
+            print(temp_cmd)
+            print(temp_location_id)
 
-# move, win condition, deposite还没写
+        print("-----------------------------------------------------------")
+        temp_cmd.append(choice)
+        temp_cmd.append(game.current_location_id)

@@ -195,7 +195,7 @@ class AdventureGame:
                 else:
                     self.flags.add("locker_opened")
                     print("The locker is opened and the lucky mug is available to be picked up at this location.")
-                    if "lucky_mug" not in location.items:
+                    if "lucky mug" not in location.items:
                         location.items.append("lucky mug")
                         self.score += 10
 
@@ -253,21 +253,17 @@ class AdventureGame:
                 self.targets.remove(item_name)
                 self.get_item_by_name(item_name).fixed = True
 
-    def save_progress(self) -> None:
-        """Save current game progress to a file."""
-        pass
-
 
 if __name__ == "__main__":
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
-    # import python_ta
-    #
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
-    # })
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999', 'static_type_checker']
+    })
     game_log = EventList()  # This is REQUIRED as one of the baseline requirements
     game = AdventureGame('game_data.json', 1)  # load data, setting initial location ID to 1
     menu = ["look", "inventory", "score", "log", "quit"]  # Regular menu options available at each location
@@ -347,8 +343,6 @@ if __name__ == "__main__":
                 curr_location.visited = True
 
             elif choice == "quit":
-                # Save and quit the game.
-                game.save_progress()
                 print("You quit the game.")
                 game.ongoing = False
 
@@ -368,11 +362,11 @@ if __name__ == "__main__":
             game.current_location_id = result
             game.score += 5
 
-            # Generate new event (record current location)
-            curr_location = game.get_current_location()
-            event_desc = f"LOCATION: {curr_location.id_num}\nCommand {choice}"
-            event = Event(curr_location.id_num, event_desc)
-            game_log.add_event(event, choice)
+        # Generate new event (record current location)
+        curr_location = game.get_current_location()
+        event_desc = f"LOCATION: {curr_location.id_num}\nCommand: {choice}"
+        event = Event(curr_location.id_num, event_desc)
+        game_log.add_event(event, choice)
 
         # Win condition
         if not game.targets:

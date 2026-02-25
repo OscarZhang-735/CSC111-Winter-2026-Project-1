@@ -33,7 +33,7 @@ class Event:
 
     Instance Attributes:
     - id_num: Integer id of this event's location
-    - description: Long description of this event's location
+    - description: Description of this event
     - next_command: String command which leads this event to the next event, None if this is the last game event
     - next: Event object representing the next event in the game, or None if this is the last game event
     - prev: Event object representing the previous event in the game, None if this is the first game event
@@ -72,9 +72,11 @@ class EventList:
     def display_events(self) -> None:
         """Display all events in chronological order."""
         curr = self.first
+        move = 1
         while curr:
-            print(f"Location: {curr.id_num}, Command: {curr.next_command}")
+            print(f"Event {move}: Location: {curr.id_num}, Command: {curr.next_command}")
             curr = curr.next
+            move += 1
 
     #  That is, the function headers (parameters, return type, etc.) must NOT be changed.
     def is_empty(self) -> bool:

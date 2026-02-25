@@ -1,0 +1,109 @@
+{
+  "locations": [
+    {
+      "id": 1,
+      "name": "Your Dorm Room",
+      "brief_description": "Your Dorm Room\nExits: North -> Study Lounge, West -> Coffee Shop",
+      "long_description": "You wake up in your dorm room, heart pounding. Your USB drive, laptop charger, and lucky mug are all missing. You need to find them and return here before the deadline.\n\nExits:\n- North -> Study Lounge\n- West -> Coffee Shop",
+      "available_commands": {
+        "go north": 2,
+        "go west": 5
+      },
+      "items": ["photo album", "phone"]
+    },
+
+    {
+      "id": 2,
+      "name": "Study Lounge",
+      "brief_description": "Study Lounge\nExits: North -> Friend's Condo, South -> Your Dorm Room, West -> Robarts Library",
+      "long_description": "This is the study lounge you and your friend always sit at. There are outlets everywhere, and the couches look very familiar.\n\nExits:\n- North -> Friend's Condo\n- South -> Your Dorm Room\n- West -> Robarts Research Library",
+      "available_commands": {
+        "go north": 3,
+        "go south": 1,
+        "go west": 4
+      },
+      "items": ["laptop charger"]
+    },
+
+    {
+      "id": 3,
+      "name": "Friend's Condo",
+      "brief_description": "Friend's Condo\nExits: South -> Study Lounge",
+      "long_description": "You arrive at your friend's condo. The hallway is quiet. A welcome mat lies in front of the door, slightly out of place.\n\nExits:\n- South -> Study Lounge",
+      "available_commands": {
+        "go south": 2
+      },
+      "items": ["password note"]
+    },
+
+    {
+      "id": 4,
+      "name": "Robarts Research Library",
+      "brief_description": "Robarts Library\nExits: East -> Study Lounge, South -> Coffee Shop",
+      "long_description": "You step into Robarts Research Library. The second floor corner desks are quiet and dimly lit-exactly where you studied last night.\n\nExits:\n- East -> Study Lounge\n- South -> Coffee Shop",
+      "available_commands": {
+        "go east": 2,
+        "go south": 5
+      },
+      "items": ["usb drive"]
+    },
+
+    {
+      "id": 5,
+      "name": "Coffee Shop",
+      "brief_description": "Coffee Shop\nExits: North -> Robarts Library, East -> Your Dorm Room",
+      "long_description": "The coffee shop smells like espresso. Near the counter is a wall of rental lockers. You suddenly remember your lucky mug.\n\nExits:\n- North -> Robarts Research Library\n- East -> Your Dorm Room",
+      "available_commands": {
+        "go north": 4,
+        "go east": 1
+      },
+      "items": ["locker"]
+    }
+  ],
+
+  "items": [
+    {
+      "name": "usb drive",
+      "description": "Your USB drive—the only copy of your project. You can’t submit without it.",
+      "fixed": false,
+      "reveals_flag": "read_phone"
+    },
+    {
+      "name": "laptop charger",
+      "description": "Your laptop charger. Without it, your battery won’t survive the final fixes.",
+      "fixed": false,
+      "reveals_flag": "read_phone"
+    },
+    {
+      "name": "lucky mug",
+      "description": "Your lucky U of T mug. It’s been with you through every all-nighter.",
+      "fixed": false,
+      "reveals_flag": "none"
+    },
+    {
+      "name": "password note",
+      "description": "A small note hidden under the welcome mat. It reads: 'Do you still remember the day little you wished to come to U of T?'",
+      "fixed": false,
+      "reveals_flag": "forgot_password"
+
+    },
+    {
+      "name": "locker",
+      "description": "A rental locker. Something important might be inside, but it needs a password.",
+      "fixed": true,
+      "reveals_flag": "none"
+    },
+    {
+      "name": "photo album",
+      "description": "A heavy photo album on your desk. It contains photos from your childhood and early visits to the University of Toronto.",
+      "fixed": true,
+      "reveals_flag": "none"
+    },
+    {
+      "name": "phone",
+      "description": "Your phone. It has your friend's messages and your Instagram feed. You might find clues here. \nNew message from your friend: 'Hey, I found a charger at our usual spot in the *study lounge*. Is it yours?'\nInstagram photo #1: A blurry shot near your friend's condo. Something small is on the table.\nInstagram photo #2: A quiet corner desk on the 2nd floor of *Robarts Library* and lap top with a USB plugged in.\nInstagram photo #3: A laptop at the *coffee shop* only has a mouse plugged in",
+      "fixed": false,
+      "reveals_flag": "none"
+    }
+  ]
+}
